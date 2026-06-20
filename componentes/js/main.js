@@ -110,7 +110,7 @@ const SUPABASE_URL     = 'https://tulyfymvskuozntgsfzw.supabase.co';
           <div class="section-label">Artigos publicados anteriormente</div>
           ${older.map(p => `
             <div class="post-list-item">
-              <a class="post-list-title" href="?post=${p.slug}">${p.title}</a>
+              <a class="post-list-title" href="?artigo=${p.slug}">${p.title}</a>
               <span class="post-list-date">${formatDate(p.published_at)}</span>
             </div>
           `).join('')}
