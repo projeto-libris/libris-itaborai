@@ -38,7 +38,50 @@ const SUPABASE_URL     = 'https://tulyfymvskuozntgsfzw.supabase.co';
       .replace(/'/g, '&#39;');
   }
 
+  function showMaintenance(message) {
+    document.title = 'Em manutenção - Libris Itaboraí';
+    const body = document.querySelector('.card-body');
+    const nav  = document.getElementById('card-nav');
+    if (body) body.classList.add('is-maintenance');
+    if (nav) nav.style.display = 'none';
+
+    document.getElementById('card-main').innerHTML = `
+      <div class="maintenance-block">
+        <div class="maintenance-icon">🛠️</div>
+        <h1 class="maintenance-title">Em manutenção</h1>
+        <p class="maintenance-msg">${escapeHtml(message || 'Voltamos em breve.')}</p>
+      </div>
+    `;
+
+    const sidebar = document.querySelector('.card-sidebar');
+    if (sidebar) sidebar.innerHTML = '';
+  }
+
+  async function checkMaintenance() {
+    try {
+      const { data, error } = await sb
+        .from('site_settings')
+        .select('is_offline, maintenance_message')
+        .eq('id', 1)
+        .single();
+
+      // Se a tabela ainda não existir ou der erro, o site segue normalmente.
+      if (error || !data) return false;
+
+      if (data.is_offline) {
+        showMaintenance(data.maintenance_message);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async function init() {
+    const isOffline = await checkMaintenance();
+    if (isOffline) return;
+
     const params      = new URLSearchParams(window.location.search);
     const postSlug    = params.get('artigo');
     const catSlug     = params.get('categoria');
